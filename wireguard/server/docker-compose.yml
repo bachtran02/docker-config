@@ -1,0 +1,39 @@
+version: "3.8"
+
+services:
+  wireguard:
+    image: lscr.io/linuxserver/wireguard:latest
+    container_name: wg_server
+    restart: unless-stopped
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Los_Angeles
+      - SERVERURL=bachtran.dev
+      - SERVERPORT=51820
+      - PEERDNS=auto
+      - LOG_CONFS=true
+      - PEERS=2
+      - INTERNAL_SUBNET=10.0.1.0/24
+      - PERSISTENTKEEPALIVE_PEERS=25
+    volumes:
+      - ./config:/config
+      - /lib/modules:/lib/modules
+    ports:
+        - 51820:51820/udp # wireguard
+        - 80:80           # http
+        - 443:443         # https
+  haproxy:
+      image: haproxy
+      container_name: haproxy_server
+      restart: unless-stopped
+      network_mode: service:wireguard
+      depends_on:
+        - wireguard
+      volumes:
+        - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg

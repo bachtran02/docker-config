@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  wireguard:
+    image: linuxserver/wireguard
+    container_name: wg_vpn
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Los_Angeles
+      - SERVERURL=bachtran.dev
+      - SERVERPORT=51821
+      - PEERDNS=auto
+      - LOG_CONFS=true
+      - PEERS=3
+      - INTERNAL_SUBNET=10.0.1.0/24
+      - PERSISTENTKEEPALIVE_PEERS=25
+    volumes:
+      - $PWD/config:/config
+      - /lib/modules:/lib/modules
+    ports:
+      - 51821:51821/udp
+    dns:
+      - 172.20.0.7
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+    restart: unless-stopped
+    networks:
+      containers:
+        ipv4_address: 172.20.0.5
+  pihole:
+    container_name: pihole
+    image: pihole/pihole:latest
+    # ports:
+    #   - 53:53/tcp
+    #   - 53:53/udp
+    #   - 80:80/tcp
+    volumes:
+      - $PWD/pihole/etc-pihole/:/etc/pihole/
+      - $PWD/pihole/etc-dnsmasq.d/:/etc/dnsmasq.d/
+    environment:
+      TZ: 'America/Los_Angeles'
+      DNSMASQ_LISTENING: 'all'
+      # WEBPASSWORD: 'password'
+    cap_add:
+      - NET_ADMIN
+    restart: unless-stopped
+    networks:
+      containers:
+        ipv4_address: 172.20.0.7
+
+networks:
+  containers:
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24

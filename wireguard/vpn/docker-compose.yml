@@ -15,11 +15,11 @@ services:
       - SERVERPORT=51821
       - PEERDNS=auto
       - LOG_CONFS=true
-      - PEERS=3
+      - PEERS=4
       - INTERNAL_SUBNET=10.0.1.0/24
       - PERSISTENTKEEPALIVE_PEERS=25
     volumes:
-      - $PWD/config:/config
+      - ./config:/config
       - /lib/modules:/lib/modules
     ports:
       - 51821:51821/udp
@@ -39,8 +39,8 @@ services:
     #   - 53:53/udp
     #   - 80:80/tcp
     volumes:
-      - $PWD/pihole/etc-pihole/:/etc/pihole/
-      - $PWD/pihole/etc-dnsmasq.d/:/etc/dnsmasq.d/
+      - ./pihole/etc-pihole/:/etc/pihole/
+      - ./pihole/etc-dnsmasq.d/:/etc/dnsmasq.d/
     environment:
       TZ: 'America/Los_Angeles'
       DNSMASQ_LISTENING: 'all'

@@ -15,7 +15,7 @@ services:
       - SERVERPORT=51821
       - PEERDNS=auto
       - LOG_CONFS=true
-      - PEERS=4
+      - PEERS=6
       - INTERNAL_SUBNET=10.0.1.0/24
       - PERSISTENTKEEPALIVE_PEERS=25
     volumes:
